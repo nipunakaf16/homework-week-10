@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>International Flight Pathways from Australia to the World</title>
+  <style>
+    /* General styling */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f8f9fd, #e0eafc);
+      color: #333;
+    }
+
+    .container {
+      width: 85%;
+      margin: 40px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Styling for heading */
+    .heading-container {
+      background-color: #006DAE;
+      color: white;
+      border-radius: 15px;
+      padding: 25px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .heading-container:hover {
+      transform: scale(1.03);
+    }
+
+    .heading-container h1 {
+      margin: 0;
+      font-size: 2.8em;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* Styling for visualization containers without hover effects */
+    .viz-container {
+      background-color: white;
+      border-radius: 15px;
+      padding: 20px;
+      width: 100%;
+      margin-top: 25px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Styling for the two columns in the third row */
+    .third-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 25px;
+    }
+
+    .column {
+      width: 48%;
+      background-color: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .column:hover {
+      transform: scale(1.02);
+    }
+
+    .column h2 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: #006DAE;
+    }
+
+    .column p {
+      line-height: 1.8;
+      font-size: 1.1em;
+      color: #555;
+    }
+
+    /* Adding rounded buttons */
+    select {
+      padding: 12px;
+      font-size: 1em;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+      margin-bottom: 20px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    select:hover {
+      background-color: #e9e9e9;
+    }
+
+    /* Footer styling */
+    .footer {
+      margin-top: 40px;
+      font-size: 1em;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Heading row -->
+    <div class="heading-container">
+      <h1>International Flight Pathways from Australia to the World</h1>
+    </div>
+
+    <!-- Second row: Map visualization -->
+    <div class="viz-container" id="vis">
+      <!-- Map visualization will be rendered here -->
+    </div>
+
+    <!-- Third row: Two columns explaining the visualizations -->
+    <div class="third-row">
+
+      <!-- First column: Information on the Map visualization -->
+      <div class="column">
+        <h2>Information on the Map visualization</h2>
+        <p>The map visualization shows airline flight connections between Australian cities and international destinations. The lines represent flight routes, colored by international cities, while the circles represent the city. You can hover over the lines or dots to get insights on each. And using the dropdown menu you select an airline and view the corresponding routes.</p>
+      </div>
+
+      <!-- Second column: Information on the Stacked bar visualization -->
+      <div class="column">
+        <h2>Information on the Stacked bar visualization</h2>
+        <p>The bar chart below displays a breakdown of the number of flights each airline operates to different regions. The annotation shows the total number of flights for that region, and you can select all airlines or a specific airline from the dropdown to compare their flight patterns across various regions. Hovering over the bar will give you further information.</p>
+      </div>
+
+    </div>
+
+    <!-- Fourth row: Stacked bar chart visualization -->
+    <div class="viz-container" id="bar-vis">
+      <!-- Stacked bar chart will be rendered here -->
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      © 2024 Nipunaka Fonseka
+    </div>
+
+  </div>
+
+  <script>
+    // Map visualization (same as in the provided map.html file)
+    const mapSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "width": 1000,
+      "height": 500,
+      "projection": {"type": "equalEarth"},
+      "params": [
+        {
+          "name": "airlineSelector",
+          "value": "British Airways",
+          "bind": {
+            "input": "select",
+            "options": [
+              "Qantas Airways",
+              "Cathay Pacific Airways",
+              "Garuda Indonesia",
+              "Air New Zealand",
+              "Japan Airlines",
+              "Korean Air",
+              "Singapore Airlines",
+              "British Airways",
+              "Air China",
+              "Emirates",
+              "Malaysia Airlines"
+            ],
+            "name": "Select Airline: "
+          }
+        }
+      ],
+      "layer": [
+        {
+          "data": {
+            "url": "https://vega.github.io/vega-datasets/data/world-110m.json",
+            "format": {"type": "topojson", "feature": "countries"}
+          },
+          "mark": {"type": "geoshape", "fill": "lightyellow", "stroke": "black"}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/nipunakaf16/dataset-for-viz/main/Fully_Cleaned_International_Airline_Activity_Data.csv"
+          },
+          "transform": [
+            {"filter": "datum.Airline == airlineSelector"},
+            {
+              "aggregate": [{"op": "count", "as": "route_count"}],
+              "groupby": [
+                "Australian_City",
+                "International_City",
+                "AUS_City_Long",
+                "AUS_City_Lat",
+                "INT_City_Long",
+                "INT_City_Lat"
+              ]
+            }
+          ],
+          "mark": {"type": "line", "strokeWidth": 2, "opacity": 0.9},
+          "encoding": {
+            "longitude": {"field": "AUS_City_Long", "type": "quantitative"},
+            "latitude": {"field": "AUS_City_Lat", "type": "quantitative"},
+            "longitude2": {"field": "INT_City_Long", "type": "quantitative"},
+            "latitude2": {"field": "INT_City_Lat", "type": "quantitative"},
+            "color": {
+              "field": "International_City",
+              "type": "nominal",
+              "scale": {
+                "range": [
+                  "#1f77b4",
+                  "#ff7f0e",
+                  "#9467bd",
+                  "#8c564b",
+                  "#e377c2",
+                  "#17becf",
+                  "#bcbd22"
+                ]
+              },
+              "legend": {"title": "International Cities"}
+            },
+            "tooltip": [
+              {
+                "field": "Australian_City",
+                "type": "nominal",
+                "title": "Australian City"
+              },
+              {
+                "field": "International_City",
+                "type": "nominal",
+                "title": "International City"
+              },
+              {
+                "field": "route_count",
+                "type": "quantitative",
+                "title": "Flight Count"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/nipunakaf16/dataset-for-viz/main/Fully_Cleaned_International_Airline_Activity_Data.csv"
+          },
+          "transform": [
+            {"filter": "datum.Airline == airlineSelector"},
+            {
+              "aggregate": [{"op": "count", "as": "city_count"}],
+              "groupby": ["Australian_City", "AUS_City_Long", "AUS_City_Lat"]
+            }
+          ],
+          "mark": {"type": "circle", "size": 30},
+          "encoding": {
+            "longitude": {"field": "AUS_City_Long", "type": "quantitative"},
+            "latitude": {"field": "AUS_City_Lat", "type": "quantitative"},
+            "color": {
+              "value": "#8B0000",
+              "legend": {
+                "title": "City Type",
+                "type": "nominal",
+                "values": ["Australian City"]
+              }
+            },
+            "tooltip": [
+              {
+                "field": "Australian_City",
+                "type": "nominal",
+                "title": "Australian City"
+              },
+              {
+                "field": "city_count",
+                "type": "quantitative",
+                "title": "Total Flights"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/nipunakaf16/dataset-for-viz/main/Fully_Cleaned_International_Airline_Activity_Data.csv"
+          },
+          "transform": [
+            {"filter": "datum.Airline == airlineSelector"},
+            {
+              "aggregate": [{"op": "count", "as": "city_count"}],
+              "groupby": ["International_City", "INT_City_Long", "INT_City_Lat"]
+            }
+          ],
+          "mark": {"type": "circle", "size": 30},
+          "encoding": {
+            "longitude": {"field": "INT_City_Long", "type": "quantitative"},
+            "latitude": {"field": "INT_City_Lat", "type": "quantitative"},
+            "color": {
+              "value": "#00008B",
+              "legend": {
+                "title": "City Type",
+                "type": "nominal",
+                "values": ["International City"]
+              }
+            },
+            "tooltip": [
+              {
+                "field": "International_City",
+                "type": "nominal",
+                "title": "International City"
+              },
+              {
+                "field": "city_count",
+                "type": "quantitative",
+                "title": "Total Flights"
+              }
+            ]
+          }
+        }
+      ],
+      "selection": {
+        "grid": {
+          "type": "interval",
+          "bind": "scales",
+          "zoom": "wheel!",
+          "translate": "[mousedown, mousemove] > mouseup"
+        }
+      },
+      "config": {"background": "#cdeffb"}
+    };
+    vegaEmbed("#vis", mapSpec, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+
+    // Stacked bar chart visualization from the uploaded file
+    const barSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "width": 1000,
+      "height": 400,
+      "data": {
+        "url": "https://raw.githubusercontent.com/nipunakaf16/dataset-for-viz/main/Fully_Cleaned_International_Airline_Activity_Data.csv"
+      },
+      "params": [
+        {
+          "name": "airline_selection",
+          "value": ["Qantas Airways"],
+          "bind": {
+            "input": "select",
+            "options": [
+              null,
+              "Qantas Airways",
+              "Cathay Pacific Airways",
+              "Garuda Indonesia",
+              "Air New Zealand",
+              "Jetstar",
+              "Japan Airlines",
+              "Korean Air",
+              "Singapore Airlines",
+              "British Airways",
+              "Air China",
+              "Emirates",
+              "Malaysia Airlines"
+            ],
+            "labels": [
+              "All Airlines",
+              "Qantas Airways",
+              "Cathay Pacific Airways",
+              "Garuda Indonesia",
+              "Air New Zealand",
+              "Jetstar",
+              "Japan Airlines",
+              "Korean Air",
+              "Singapore Airlines",
+              "British Airways",
+              "Air China",
+              "Emirates",
+              "Malaysia Airlines"
+            ],
+            "multiple": true,
+            "name": "Select Airlines: "
+          }
+        }
+      ],
+      "transform": [
+        {
+          "filter": "airline_selection == null || airline_selection.length == 0 || indexof(airline_selection, datum.Airline) >= 0"
+        }
+      ],
+      "layer": [
+        {
+          "mark": "bar",
+          "encoding": {
+            "x": {
+              "field": "Service_Region",
+              "type": "nominal",
+              "title": "Service Region",
+              "axis": {"labelAngle": -45}
+            },
+            "y": {
+              "aggregate": "sum",
+              "field": "All_Flights",
+              "type": "quantitative",
+              "title": "Total Number of Flights"
+            },
+            "color": {
+              "field": "Airline",
+              "type": "nominal",
+              "scale": {"scheme": "category20"}
+            },
+            "tooltip": [
+              {"field": "Airline", "type": "nominal", "title": "Airline"},
+              {
+                "field": "Service_Region",
+                "type": "nominal",
+                "title": "Service Region"
+              },
+              {
+                "field": "All_Flights",
+                "type": "quantitative",
+                "aggregate": "sum",
+                "title": "Total Flights"
+              }
+            ]
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "left",
+            "dx": 10,
+            "dy": -10,
+            "fontSize": 13,
+            "fontWeight": "bold",
+            "color": "black"
+          },
+          "encoding": {
+            "x": {"field": "Service_Region", "type": "nominal"},
+            "y": {
+              "aggregate": "sum",
+              "field": "All_Flights",
+              "type": "quantitative"
+            },
+            "text": {
+              "aggregate": "sum",
+              "field": "All_Flights",
+              "type": "quantitative",
+              "format": ",",
+              "title": "Total Flights"
+            }
+          }
+        }
+      ],
+      "config": {"view": {"stroke": null}, "axis": {"grid": false}}
+    };
+    vegaEmbed("#bar-vis", barSpec, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+  </script>
+
+</body>
+</html>
